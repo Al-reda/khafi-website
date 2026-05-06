@@ -44,6 +44,30 @@ body{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace;background:#0a
 .map-info{margin-top:10px;padding:8px 10px;background:rgba(0,255,136,.05);border-radius:8px;font-size:10px;color:#999;line-height:1.7}
 .footer{text-align:center;margin-top:12px;font-size:9px;color:#555;letter-spacing:2px}
 svg text{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .wrap{padding:10px 8px}
+  .hdr h1{font-size:14px;letter-spacing:3px}
+  .hdr p{font-size:8px;letter-spacing:1px}
+  .readout{gap:10px;font-size:9px}
+  .card{padding:10px}
+  .gauges{grid-template-columns:1fr 1fr;gap:8px}
+  .gauge-val{font-size:18px}
+  .elevon-row{grid-template-columns:1fr;gap:8px}
+  .elevon-val{font-size:18px}
+  .tx-card{padding:12px 8px}
+  .tx-title{font-size:9px;letter-spacing:1px;margin-bottom:10px}
+  .tx-row{flex-direction:column;gap:16px;align-items:center}
+  .ctrl-body{width:180px;order:-1}
+  .stick-col{display:flex;flex-direction:column;align-items:center}
+  #stickL, #stickR{width:140px;height:140px}
+  .map-card{padding:10px}
+  .map-grid{grid-template-columns:1fr;gap:4px}
+  .map-info{font-size:9px}
+  .footer{font-size:8px}
+  div[style*="height:360px"]{height:250px !important}
+}
 </style>
 </head>
 <body>
@@ -168,7 +192,7 @@ svg text{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace}
     <div class="tx-row">
       <div class="stick-col">
         <div class="stick-label">LEFT STICK</div>
-        <svg id="stickL" width="80" height="80" style="cursor:grab;touch-action:none">
+        <svg id="stickL" width="80" height="80" viewBox="0 0 80 80" style="cursor:grab;touch-action:none">
           <circle cx="40" cy="40" r="38" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
           <line x1="40" y1="4" x2="40" y2="76" stroke="#222" stroke-width="1"/>
           <line x1="4" y1="40" x2="76" y2="40" stroke="#222" stroke-width="1"/>
@@ -188,7 +212,7 @@ svg text{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace}
       </div>
       <div class="stick-col">
         <div class="stick-label">RIGHT STICK</div>
-        <svg id="stickR" width="80" height="80" style="cursor:grab;touch-action:none">
+        <svg id="stickR" width="80" height="80" viewBox="0 0 80 80" style="cursor:grab;touch-action:none">
           <circle cx="40" cy="40" r="38" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
           <line x1="40" y1="4" x2="40" y2="76" stroke="#222" stroke-width="1"/>
           <line x1="4" y1="40" x2="76" y2="40" stroke="#222" stroke-width="1"/>
@@ -296,11 +320,13 @@ mapData.forEach(r=>{
 // Stick interaction
 function getPos(e,svg){
   const r=svg.getBoundingClientRect();
+  const scale=r.width/80; // account for CSS scaling
   const cx=r.left+r.width/2,cy=r.top+r.height/2;
+  const mx=MX*scale;
   let dx=e.clientX-cx,dy=e.clientY-cy;
   const d=Math.sqrt(dx*dx+dy*dy);
-  if(d>MX){dx=dx/d*MX;dy=dy/d*MX}
-  return{x:clamp(dx/MX,-1,1),y:clamp(dy/MX,-1,1)};
+  if(d>mx){dx=dx/d*mx;dy=dy/d*mx}
+  return{x:clamp(dx/mx,-1,1),y:clamp(dy/mx,-1,1)};
 }
 stickL.addEventListener('pointerdown',e=>{e.preventDefault();e.target.setPointerCapture(e.pointerId);drag='left';ls=getPos(e,stickL);stickL.style.cursor='grabbing'});
 stickR.addEventListener('pointerdown',e=>{e.preventDefault();e.target.setPointerCapture(e.pointerId);drag='right';rs=getPos(e,stickR);stickR.style.cursor='grabbing'});
