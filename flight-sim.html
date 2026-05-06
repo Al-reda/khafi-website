@@ -7,42 +7,42 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace;background:linear-gradient(170deg,#f8fafc,#f1f5f9 40%,#e8ecf1);color:#1e293b;min-height:100vh;user-select:none;-webkit-user-select:none;overflow-x:hidden}
-.grid-bg{position:fixed;inset:0;opacity:.05;pointer-events:none;background-image:linear-gradient(#94a3b8 1px,transparent 1px),linear-gradient(90deg,#94a3b8 1px,transparent 1px);background-size:40px 40px}
+body{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace;background:#0a0a0a;color:#e0e0e0;min-height:100vh;user-select:none;-webkit-user-select:none;overflow-x:hidden}
+.grid-bg{position:fixed;inset:0;opacity:.04;pointer-events:none;background-image:linear-gradient(#00ff88 1px,transparent 1px),linear-gradient(90deg,#00ff88 1px,transparent 1px);background-size:40px 40px}
 .wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:20px 16px}
-.card{border:1px solid #cbd5e1;border-radius:12px;background:rgba(255,255,255,.75);padding:16px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
-.card2{border:1px solid #cbd5e1;border-radius:10px;background:rgba(255,255,255,.8);padding:10px 10px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card{border:1px solid rgba(0,255,136,0.1);border-radius:12px;background:rgba(22,22,22,.9);padding:16px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.3)}
+.card2{border:1px solid rgba(0,255,136,0.1);border-radius:10px;background:rgba(22,22,22,.9);padding:10px 10px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .hdr{text-align:center;margin-bottom:14px}
-.hdr h1{font-size:20px;font-weight:700;letter-spacing:5px;color:#0f172a;margin:0 0 4px}
-.hdr p{font-size:10px;color:#94a3b8;letter-spacing:3px;margin:0}
-.readout{display:flex;justify-content:center;gap:24px;font-size:10px;color:#94a3b8;letter-spacing:1px;margin-bottom:8px;flex-wrap:wrap}
+.hdr h1{font-size:20px;font-weight:700;letter-spacing:5px;color:#00ff88;margin:0 0 4px}
+.hdr p{font-size:10px;color:#666;letter-spacing:3px;margin:0}
+.readout{display:flex;justify-content:center;gap:24px;font-size:10px;color:#666;letter-spacing:1px;margin-bottom:8px;flex-wrap:wrap}
 .readout b{font-weight:700}
 .gauges{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px}
-.gauge-label{font-size:9px;color:#94a3b8;letter-spacing:2px;margin-bottom:2px}
+.gauge-label{font-size:9px;color:#666;letter-spacing:2px;margin-bottom:2px}
 .gauge-val{font-size:24px;font-weight:700;line-height:1.2}
-.gauge-note{font-size:8px;color:#94a3b8;margin-top:2px}
-.gauge-bar{margin-top:5px;height:5px;border-radius:3px;background:#e2e8f0;overflow:hidden;position:relative}
+.gauge-note{font-size:8px;color:#666;margin-top:2px}
+.gauge-bar{margin-top:5px;height:5px;border-radius:3px;background:#222;overflow:hidden;position:relative}
 .gauge-fill{position:absolute;top:0;bottom:0;border-radius:3px}
 .elevon-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.elevon-card{border:1px solid #b3e0ee;border-radius:10px;background:rgba(8,145,178,.04);padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
-.elevon-label{font-size:10px;color:#0891b2;font-weight:700}
-.elevon-sub{font-size:8px;color:#94a3b8}
-.elevon-val{font-size:22px;font-weight:700;color:#0891b2}
-.tx-card{border:1px solid #cbd5e1;border-radius:12px;background:rgba(255,255,255,.85);padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.tx-title{font-size:10px;color:#94a3b8;letter-spacing:3px;margin-bottom:14px;text-align:center;font-weight:600}
+.elevon-card{border:1px solid rgba(0,255,136,0.15);border-radius:10px;background:rgba(0,255,136,.04);padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.elevon-label{font-size:10px;color:#00ff88;font-weight:700}
+.elevon-sub{font-size:8px;color:#666}
+.elevon-val{font-size:22px;font-weight:700;color:#00ff88}
+.tx-card{border:1px solid rgba(0,255,136,0.1);border-radius:12px;background:rgba(22,22,22,.9);padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.tx-title{font-size:10px;color:#666;letter-spacing:3px;margin-bottom:14px;text-align:center;font-weight:600}
 .tx-row{display:flex;justify-content:center;align-items:center;gap:28px}
 .stick-col{text-align:center}
-.stick-label{font-size:9px;color:#64748b;margin-bottom:6px;letter-spacing:1px;font-weight:600}
-.ctrl-body{width:140px;padding:14px 10px;border-radius:16px;background:linear-gradient(180deg,#e2e8f0,#d1d5db);border:1px solid #94a3b8;text-align:center}
-.ctrl-screen{width:100%;height:36px;border-radius:5px;background:#f1f5f9;border:1px solid #94a3b8;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
-.ctrl-screen span{font-size:8px;color:#64748b;letter-spacing:1px;font-weight:700}
+.stick-label{font-size:9px;color:#888;margin-bottom:6px;letter-spacing:1px;font-weight:600}
+.ctrl-body{width:140px;padding:14px 10px;border-radius:16px;background:linear-gradient(180deg,#1a1a1a,#111);border:1px solid #333;text-align:center}
+.ctrl-screen{width:100%;height:36px;border-radius:5px;background:#0a0a0a;border:1px solid #333;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.ctrl-screen span{font-size:8px;color:#666;letter-spacing:1px;font-weight:700}
 .sw-row{display:flex;justify-content:center;gap:6px;margin-bottom:6px}
-.map-card{border:1px solid #cbd5e1;border-radius:12px;background:rgba(255,255,255,.8);padding:14px 18px;margin-top:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-.map-title{font-size:10px;color:#94a3b8;letter-spacing:3px;margin-bottom:8px;font-weight:600}
+.map-card{border:1px solid rgba(0,255,136,0.1);border-radius:12px;background:rgba(22,22,22,.9);padding:14px 18px;margin-top:14px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.map-title{font-size:10px;color:#666;letter-spacing:3px;margin-bottom:8px;font-weight:600}
 .map-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 20px;font-size:10px}
-.map-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;background:rgba(241,245,249,.6)}
-.map-info{margin-top:10px;padding:8px 10px;background:rgba(8,145,178,.05);border-radius:8px;font-size:10px;color:#475569;line-height:1.7}
-.footer{text-align:center;margin-top:12px;font-size:9px;color:#94a3b8;letter-spacing:2px}
+.map-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;background:rgba(22,22,22,.6)}
+.map-info{margin-top:10px;padding:8px 10px;background:rgba(0,255,136,.05);border-radius:8px;font-size:10px;color:#999;line-height:1.7}
+.footer{text-align:center;margin-top:12px;font-size:9px;color:#555;letter-spacing:2px}
 svg text{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace}
 </style>
 </head>
@@ -59,57 +59,57 @@ svg text{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace}
     <div style="display:flex;justify-content:center;align-items:center;height:360px">
       <svg id="aircraft" viewBox="-360 -210 720 440" style="width:100%;max-width:720px;height:100%">
         <defs>
-          <marker id="ac" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#0891b2"/></marker>
+          <marker id="ac" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#00ff88"/></marker>
           <marker id="ar" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#7c3aed"/></marker>
-          <marker id="ag" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#94a3b8"/></marker>
+          <marker id="ag" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#666"/></marker>
         </defs>
         <ellipse id="shadow" cx="0" cy="200" rx="260" ry="28" fill="rgba(0,0,0,0.05)"/>
 
         <!-- Main body (wing stops at hinge line) -->
-        <path d="M 0 -155 L -10 -135 L -20 -105 C -40 -65,-70 -35,-275 15 L -290 23 L -275 28 L -125 22 L -75 60 L -45 72 L -20 82 L -12 112 L -6 132 L 0 142 L 6 132 L 12 112 L 20 82 L 45 72 L 75 60 L 125 22 L 275 28 L 290 23 L 275 15 C 70 -35,40 -65,20 -105 L 10 -135 L 0 -155 Z" fill="rgba(241,245,249,0.95)" stroke="#475569" stroke-width="1.5"/>
+        <path d="M 0 -155 L -10 -135 L -20 -105 C -40 -65,-70 -35,-275 15 L -290 23 L -275 28 L -125 22 L -75 60 L -45 72 L -20 82 L -12 112 L -6 132 L 0 142 L 6 132 L 12 112 L 20 82 L 45 72 L 75 60 L 125 22 L 275 28 L 290 23 L 275 15 C 70 -35,40 -65,20 -105 L 10 -135 L 0 -155 Z" fill="rgba(30,30,30,0.95)" stroke="#555" stroke-width="1.5"/>
         <!-- Center body hump -->
-        <path d="M -15 -115 C -20 -15,-30 50,-40 70 L -20 85 L 0 90 L 20 85 L 40 70 C 30 50,20 -15,15 -115 Z" fill="rgba(226,232,240,0.4)" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="3 3"/>
+        <path d="M -15 -115 C -20 -15,-30 50,-40 70 L -20 85 L 0 90 L 20 85 L 40 70 C 30 50,20 -15,15 -115 Z" fill="rgba(50,50,50,0.4)" stroke="#666" stroke-width="0.8" stroke-dasharray="3 3"/>
         <!-- Sensor -->
-        <ellipse cx="0" cy="-95" rx="10" ry="15" fill="rgba(8,145,178,0.08)" stroke="#0891b2" stroke-width="1"/>
+        <ellipse cx="0" cy="-95" rx="10" ry="15" fill="rgba(8,145,178,0.08)" stroke="#00ff88" stroke-width="1"/>
         <!-- Winglets -->
-        <path d="M -292 18 L -305 10 L -300 26 L -287 28 Z" fill="rgba(203,213,225,0.6)" stroke="#64748b" stroke-width="1"/>
-        <path d="M 292 18 L 305 10 L 300 26 L 287 28 Z" fill="rgba(203,213,225,0.6)" stroke="#64748b" stroke-width="1"/>
+        <path d="M -292 18 L -305 10 L -300 26 L -287 28 Z" fill="rgba(60,60,60,0.6)" stroke="#777" stroke-width="1"/>
+        <path d="M 292 18 L 305 10 L 300 26 L 287 28 Z" fill="rgba(60,60,60,0.6)" stroke="#777" stroke-width="1"/>
 
         <!-- Hinge lines for elevons -->
-        <line x1="-270" y1="28" x2="-130" y2="22" stroke="#94a3b8" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.5"/>
-        <line x1="270" y1="28" x2="130" y2="22" stroke="#94a3b8" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.5"/>
+        <line x1="-270" y1="28" x2="-130" y2="22" stroke="#666" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.5"/>
+        <line x1="270" y1="28" x2="130" y2="22" stroke="#666" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.5"/>
 
         <!-- ELEVON LEFT FLAP -->
         <g id="elevonLG">
-          <path id="elevonLP" d="M -270 28 L -275 33 L -235 38 L -200 34 L -185 41 L -155 36 L -125 38 L -130 22 L -270 28 Z" fill="rgba(8,145,178,0.08)" stroke="#0891b2" stroke-width="2.5"/>
-          <text id="elevonLT" x="-200" y="35" fill="#0891b2" font-size="11" text-anchor="middle" font-weight="700">0°</text>
+          <path id="elevonLP" d="M -270 28 L -275 33 L -235 38 L -200 34 L -185 41 L -155 36 L -125 38 L -130 22 L -270 28 Z" fill="rgba(8,145,178,0.08)" stroke="#00ff88" stroke-width="2.5"/>
+          <text id="elevonLT" x="-200" y="35" fill="#00ff88" font-size="11" text-anchor="middle" font-weight="700">0°</text>
         </g>
         <!-- Big UP/DOWN arrow for left elevon -->
         <g id="elevonLArrow" visibility="hidden">
           <polygon id="elevonLAUp" points="-200,8 -210,22 -204,22 -204,38 -196,38 -196,22 -190,22" fill="#dc4040" stroke="#dc4040" stroke-width="1" opacity="0.8"/>
-          <polygon id="elevonLADown" points="-200,48 -210,34 -204,34 -204,18 -196,18 -196,34 -190,34" fill="#0891b2" stroke="#0891b2" stroke-width="1" opacity="0.8"/>
+          <polygon id="elevonLADown" points="-200,48 -210,34 -204,34 -204,18 -196,18 -196,34 -190,34" fill="#00ff88" stroke="#00ff88" stroke-width="1" opacity="0.8"/>
         </g>
-        <line id="elevonLA" x1="-200" y1="25" x2="-200" y2="25" stroke="#0891b2" stroke-width="2" marker-end="url(#ac)" visibility="hidden"/>
+        <line id="elevonLA" x1="-200" y1="25" x2="-200" y2="25" stroke="#00ff88" stroke-width="2" marker-end="url(#ac)" visibility="hidden"/>
 
         <!-- ELEVON RIGHT FLAP -->
         <g id="elevonRG">
-          <path id="elevonRP" d="M 270 28 L 275 33 L 235 38 L 200 34 L 185 41 L 155 36 L 125 38 L 130 22 L 270 28 Z" fill="rgba(8,145,178,0.08)" stroke="#0891b2" stroke-width="2.5"/>
-          <text id="elevonRT" x="200" y="35" fill="#0891b2" font-size="11" text-anchor="middle" font-weight="700">0°</text>
+          <path id="elevonRP" d="M 270 28 L 275 33 L 235 38 L 200 34 L 185 41 L 155 36 L 125 38 L 130 22 L 270 28 Z" fill="rgba(8,145,178,0.08)" stroke="#00ff88" stroke-width="2.5"/>
+          <text id="elevonRT" x="200" y="35" fill="#00ff88" font-size="11" text-anchor="middle" font-weight="700">0°</text>
         </g>
         <!-- Big UP/DOWN arrow for right elevon -->
         <g id="elevonRArrow" visibility="hidden">
           <polygon id="elevonRAUp" points="200,8 190,22 196,22 196,38 204,38 204,22 210,22" fill="#dc4040" stroke="#dc4040" stroke-width="1" opacity="0.8"/>
-          <polygon id="elevonRADown" points="200,48 190,34 196,34 196,18 204,18 204,34 210,34" fill="#0891b2" stroke="#0891b2" stroke-width="1" opacity="0.8"/>
+          <polygon id="elevonRADown" points="200,48 190,34 196,34 196,18 204,18 204,34 210,34" fill="#00ff88" stroke="#00ff88" stroke-width="1" opacity="0.8"/>
         </g>
-        <line id="elevonRA" x1="200" y1="25" x2="200" y2="25" stroke="#0891b2" stroke-width="2" marker-end="url(#ac)" visibility="hidden"/>
+        <line id="elevonRA" x1="200" y1="25" x2="200" y2="25" stroke="#00ff88" stroke-width="2" marker-end="url(#ac)" visibility="hidden"/>
 
 
 
         <!-- ====== WING-MOUNTED VERTICAL FINS (fixed) — on the wings at ~70% span ====== -->
         <!-- Left fin on wing (close to center, forward) -->
-        <path d="M -68 -8 L -75 -18 L -79 -28 L -75 -22 L -71 -14 L -66 -6 Z" fill="rgba(226,232,240,0.75)" stroke="#64748b" stroke-width="1.2"/>
+        <path d="M -68 -8 L -75 -18 L -79 -28 L -75 -22 L -71 -14 L -66 -6 Z" fill="rgba(50,50,50,0.75)" stroke="#777" stroke-width="1.2"/>
         <!-- Right fin on wing -->
-        <path d="M 68 -8 L 75 -18 L 79 -28 L 75 -22 L 71 -14 L 66 -6 Z" fill="rgba(226,232,240,0.75)" stroke="#64748b" stroke-width="1.2"/>
+        <path d="M 68 -8 L 75 -18 L 79 -28 L 75 -22 L 71 -14 L 66 -6 Z" fill="rgba(50,50,50,0.75)" stroke="#777" stroke-width="1.2"/>
 
         <!-- ====== RUDDER LEFT (on left wing, behind left fin) ====== -->
         <!-- Pivot at (-70, -6) — hinge at base of fin, forward -->
@@ -138,23 +138,23 @@ svg text{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace}
         <circle cx="105" cy="22" r="3" fill="none" stroke="#059669" stroke-width="1.5"/>
 
         <!-- Labels -->
-        <text x="-200" y="58" fill="#0891b2" font-size="9" text-anchor="middle" font-weight="700">ELEVON L</text>
-        <text x="200" y="58" fill="#0891b2" font-size="9" text-anchor="middle" font-weight="700">ELEVON R</text>
+        <text x="-200" y="58" fill="#00ff88" font-size="9" text-anchor="middle" font-weight="700">ELEVON L</text>
+        <text x="200" y="58" fill="#00ff88" font-size="9" text-anchor="middle" font-weight="700">ELEVON R</text>
 
-        <text x="-90" y="-22" fill="#64748b" font-size="7" text-anchor="middle">FIN</text>
-        <text x="90" y="-22" fill="#64748b" font-size="7" text-anchor="middle">FIN</text>
+        <text x="-90" y="-22" fill="#777" font-size="7" text-anchor="middle">FIN</text>
+        <text x="90" y="-22" fill="#777" font-size="7" text-anchor="middle">FIN</text>
         <text x="-90" y="24" fill="#7c3aed" font-size="8" text-anchor="middle" font-weight="700">RUDDER L</text>
         <text x="90" y="24" fill="#7c3aed" font-size="8" text-anchor="middle" font-weight="700">RUDDER R</text>
         <text x="0" y="168" fill="#dc2626" font-size="9" text-anchor="middle" font-weight="700">MOTOR</text>
-        <g opacity="0.4"><line x1="-320" y1="-140" x2="-320" y2="-175" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ag)"/><text x="-320" y="-128" fill="#94a3b8" font-size="9" text-anchor="middle" font-weight="600">FWD</text></g>
-        <text id="mixLabel" x="0" y="-185" fill="#0891b2" font-size="10" text-anchor="middle" font-weight="700" opacity="0.7" visibility="hidden"></text>
+        <g opacity="0.4"><line x1="-320" y1="-140" x2="-320" y2="-175" stroke="#666" stroke-width="1.5" marker-end="url(#ag)"/><text x="-320" y="-128" fill="#666" font-size="9" text-anchor="middle" font-weight="600">FWD</text></g>
+        <text id="mixLabel" x="0" y="-185" fill="#00ff88" font-size="10" text-anchor="middle" font-weight="700" opacity="0.7" visibility="hidden"></text>
         <!-- Color legend -->
         <g transform="translate(240,-170)">
-          <rect x="0" y="0" width="90" height="42" rx="4" fill="rgba(255,255,255,0.7)" stroke="#cbd5e1" stroke-width="0.5"/>
+          <rect x="0" y="0" width="90" height="42" rx="4" fill="rgba(20,20,20,0.8)" stroke="#333" stroke-width="0.5"/>
           <polygon points="12,10 8,16 10,16 10,20 14,20 14,16 16,16" fill="#dc4040"/>
           <text x="22" y="18" fill="#dc4040" font-size="8" font-weight="700">= ELEVON UP</text>
-          <polygon points="12,30 8,24 10,24 10,20 14,20 14,24 16,24" fill="#0891b2"/>
-          <text x="22" y="32" fill="#0891b2" font-size="8" font-weight="700">= ELEVON DN</text>
+          <polygon points="12,30 8,24 10,24 10,20 14,20 14,24 16,24" fill="#00ff88"/>
+          <text x="22" y="32" fill="#00ff88" font-size="8" font-weight="700">= ELEVON DN</text>
         </g>
       </svg>
     </div>
@@ -169,11 +169,11 @@ svg text{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace}
       <div class="stick-col">
         <div class="stick-label">LEFT STICK</div>
         <svg id="stickL" width="80" height="80" style="cursor:grab;touch-action:none">
-          <circle cx="40" cy="40" r="38" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
-          <line x1="40" y1="4" x2="40" y2="76" stroke="#e2e8f0" stroke-width="1"/>
-          <line x1="4" y1="40" x2="76" y2="40" stroke="#e2e8f0" stroke-width="1"/>
-          <circle id="knobL" cx="40" cy="40" r="14" fill="white" stroke="#94a3b8" stroke-width="2"/>
-          <circle id="knobLd" cx="40" cy="40" r="4" fill="#94a3b8"/>
+          <circle cx="40" cy="40" r="38" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+          <line x1="40" y1="4" x2="40" y2="76" stroke="#222" stroke-width="1"/>
+          <line x1="4" y1="40" x2="76" y2="40" stroke="#222" stroke-width="1"/>
+          <circle id="knobL" cx="40" cy="40" r="14" fill="#333" stroke="#666" stroke-width="2"/>
+          <circle id="knobLd" cx="40" cy="40" r="4" fill="#666"/>
         </svg>
         <div style="margin-top:6px;font-size:9px;color:#7c3aed;font-weight:700">← CH4 YAW →</div>
         <div style="font-size:8px;color:#7c3aed;opacity:.7">Wing Rudders ±45°</div>
@@ -189,14 +189,14 @@ svg text{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace}
       <div class="stick-col">
         <div class="stick-label">RIGHT STICK</div>
         <svg id="stickR" width="80" height="80" style="cursor:grab;touch-action:none">
-          <circle cx="40" cy="40" r="38" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
-          <line x1="40" y1="4" x2="40" y2="76" stroke="#e2e8f0" stroke-width="1"/>
-          <line x1="4" y1="40" x2="76" y2="40" stroke="#e2e8f0" stroke-width="1"/>
-          <circle id="knobR" cx="40" cy="40" r="14" fill="white" stroke="#94a3b8" stroke-width="2"/>
-          <circle id="knobRd" cx="40" cy="40" r="4" fill="#94a3b8"/>
+          <circle cx="40" cy="40" r="38" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+          <line x1="40" y1="4" x2="40" y2="76" stroke="#222" stroke-width="1"/>
+          <line x1="4" y1="40" x2="76" y2="40" stroke="#222" stroke-width="1"/>
+          <circle id="knobR" cx="40" cy="40" r="14" fill="#333" stroke="#666" stroke-width="2"/>
+          <circle id="knobRd" cx="40" cy="40" r="4" fill="#666"/>
         </svg>
-        <div style="margin-top:6px;font-size:9px;color:#0891b2;font-weight:700">← CH1 ROLL →</div>
-        <div style="font-size:8px;color:#0891b2;opacity:.7">Elevons differential</div>
+        <div style="margin-top:6px;font-size:9px;color:#00ff88;font-weight:700">← CH1 ROLL →</div>
+        <div style="font-size:8px;color:#00ff88;opacity:.7">Elevons differential</div>
         <div style="font-size:9px;color:#0e7490;font-weight:700;margin-top:3px">↑ CH2 PITCH ↓</div>
         <div style="font-size:8px;color:#0e7490;opacity:.7">Elevons same direction</div>
       </div>
@@ -206,7 +206,7 @@ svg text{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace}
   <div class="map-card">
     <div class="map-title">ARDUPLANE OUTPUT MAP — ELEVON + WING RUDDERS</div>
     <div class="map-grid" id="mapGrid"></div>
-    <div class="map-info"><strong style="color:#0891b2">Elevon mixing:</strong> SERVO1_FUNCTION=77 (Left Elevon), SERVO2_FUNCTION=78 (Right Elevon). <strong style="color:#7c3aed">Wing rudders:</strong> Mounted on wing-mounted vertical fins, SERVO4_FUNCTION=21. ArduPlane handles all mixing. No mixing on TX12.</div>
+    <div class="map-info"><strong style="color:#00ff88">Elevon mixing:</strong> SERVO1_FUNCTION=77 (Left Elevon), SERVO2_FUNCTION=78 (Right Elevon). <strong style="color:#7c3aed">Wing rudders:</strong> Mounted on wing-mounted vertical fins, SERVO4_FUNCTION=21. ArduPlane handles all mixing. No mixing on TX12.</div>
   </div>
   <div class="footer">STICKS SPRING BACK (EXCEPT THROTTLE) • ELEVON ±45° • WING RUDDERS ±45°</div>
 </div>
@@ -245,15 +245,15 @@ const swEl=document.getElementById('switches');
 ['SA','SB','SC','SD'].forEach(s=>{
   const d=document.createElement('div');d.style.textAlign='center';
   const b=document.createElement('div');
-  Object.assign(b.style,{width:'10px',height:'16px',borderRadius:'3px',margin:'0 auto 2px',background:s==='SD'?'#059669':'#94a3b8',opacity:s==='SD'?'0.9':'0.25'});
+  Object.assign(b.style,{width:'10px',height:'16px',borderRadius:'3px',margin:'0 auto 2px',background:s==='SD'?'#059669':'#666',opacity:s==='SD'?'0.9':'0.25'});
   const t=document.createElement('div');t.textContent=s;
-  Object.assign(t.style,{fontSize:'6px',color:s==='SD'?'#059669':'#94a3b8',fontWeight:'600'});
+  Object.assign(t.style,{fontSize:'6px',color:s==='SD'?'#059669':'#666',fontWeight:'600'});
   d.appendChild(b);d.appendChild(t);swEl.appendChild(d);
 });
 
 // Gauges
 const gaugeData=[
-  {label:'ROLL',ch:'CH1',color:'#0891b2',note:'Elevons differential',key:'roll'},
+  {label:'ROLL',ch:'CH1',color:'#00ff88',note:'Elevons differential',key:'roll'},
   {label:'PITCH',ch:'CH2',color:'#0e7490',note:'Elevons same dir',key:'pitch'},
   {label:'YAW',ch:'CH4',color:'#7c3aed',note:'Wing rudders ±45°',key:'yaw'},
   {label:'THROTTLE',ch:'CH3',color:'#dc2626',note:'Pusher motor',key:'thr'},
@@ -278,8 +278,8 @@ const ev0=document.getElementById('ev0'),ev1=document.getElementById('ev1');
 
 // Map
 const mapData=[
-  {o:'MAIN 1',n:'Elevon Left (wing)',ch:'CH1+CH2',ax:'Roll+Pitch',c:'#0891b2'},
-  {o:'MAIN 2',n:'Elevon Right (wing)',ch:'CH1+CH2',ax:'Roll+Pitch',c:'#0891b2'},
+  {o:'MAIN 1',n:'Elevon Left (wing)',ch:'CH1+CH2',ax:'Roll+Pitch',c:'#00ff88'},
+  {o:'MAIN 2',n:'Elevon Right (wing)',ch:'CH1+CH2',ax:'Roll+Pitch',c:'#00ff88'},
   {o:'MAIN 3',n:'Motor / ESC',ch:'CH3',ax:'Throttle',c:'#dc2626'},
   {o:'MAIN 4',n:'Rudders (on wings)',ch:'CH4',ax:'Yaw ±45°',c:'#7c3aed'},
   {o:'MAIN 5',n:'Landing Gear Nose',ch:'CH10',ax:'SD Switch',c:'#059669'},
@@ -289,7 +289,7 @@ const mapData=[
 const mapGrid=document.getElementById('mapGrid');
 mapData.forEach(r=>{
   const d=document.createElement('div');d.className='map-row';
-  d.innerHTML='<span style="font-weight:700;color:'+r.c+';min-width:52px">'+r.o+'</span><span style="flex:1;color:#475569">'+r.n+'</span><span style="color:#94a3b8;font-size:9px">'+r.ch+'</span><span style="color:'+r.c+';font-size:9px;font-weight:700;min-width:55px;text-align:right">'+r.ax+'</span>';
+  d.innerHTML='<span style="font-weight:700;color:'+r.c+';min-width:52px">'+r.o+'</span><span style="flex:1;color:#555">'+r.n+'</span><span style="color:#666;font-size:9px">'+r.ch+'</span><span style="color:'+r.c+';font-size:9px;font-weight:700;min-width:55px;text-align:right">'+r.ax+'</span>';
   mapGrid.appendChild(d);
 });
 
@@ -351,16 +351,16 @@ function tick(){
   elevonRG.setAttribute('transform','translate(0,'+(25*(1-scR))+') scale(1,'+scR+')');
   // Strong color: UP=red, DOWN=teal
   if(elevonL>1){elevonLP.setAttribute('fill','rgba(220,64,64,'+(0.15+absL/MAX_DEF*0.5)+')');elevonLP.setAttribute('stroke','#dc4040')}
-  else if(elevonL<-1){elevonLP.setAttribute('fill','rgba(8,145,178,'+(0.15+absL/MAX_DEF*0.5)+')');elevonLP.setAttribute('stroke','#0891b2')}
-  else{elevonLP.setAttribute('fill','rgba(8,145,178,0.06)');elevonLP.setAttribute('stroke','#0891b2')}
+  else if(elevonL<-1){elevonLP.setAttribute('fill','rgba(8,145,178,'+(0.15+absL/MAX_DEF*0.5)+')');elevonLP.setAttribute('stroke','#00ff88')}
+  else{elevonLP.setAttribute('fill','rgba(8,145,178,0.06)');elevonLP.setAttribute('stroke','#00ff88')}
   if(elevonR>1){elevonRP.setAttribute('fill','rgba(220,64,64,'+(0.15+absR/MAX_DEF*0.5)+')');elevonRP.setAttribute('stroke','#dc4040')}
-  else if(elevonR<-1){elevonRP.setAttribute('fill','rgba(8,145,178,'+(0.15+absR/MAX_DEF*0.5)+')');elevonRP.setAttribute('stroke','#0891b2')}
-  else{elevonRP.setAttribute('fill','rgba(8,145,178,0.06)');elevonRP.setAttribute('stroke','#0891b2')}
+  else if(elevonR<-1){elevonRP.setAttribute('fill','rgba(8,145,178,'+(0.15+absR/MAX_DEF*0.5)+')');elevonRP.setAttribute('stroke','#00ff88')}
+  else{elevonRP.setAttribute('fill','rgba(8,145,178,0.06)');elevonRP.setAttribute('stroke','#00ff88')}
   // Angle text with big arrow emoji
   elevonLT.textContent=(elevonL>1?'\u2B06 +'+elevonL.toFixed(0)+'\u00b0':elevonL<-1?'\u2B07 '+elevonL.toFixed(0)+'\u00b0':'0\u00b0');
   elevonRT.textContent=(elevonR>1?'\u2B06 +'+elevonR.toFixed(0)+'\u00b0':elevonR<-1?'\u2B07 '+elevonR.toFixed(0)+'\u00b0':'0\u00b0');
-  elevonLT.setAttribute('fill',elevonL>1?'#dc4040':elevonL<-1?'#0891b2':'#0891b2');
-  elevonRT.setAttribute('fill',elevonR>1?'#dc4040':elevonR<-1?'#0891b2':'#0891b2');
+  elevonLT.setAttribute('fill',elevonL>1?'#dc4040':elevonL<-1?'#00ff88':'#00ff88');
+  elevonRT.setAttribute('fill',elevonR>1?'#dc4040':elevonR<-1?'#00ff88':'#00ff88');
   // Big chunky arrow shapes
   if(absL>2){
     elevonLArrow.setAttribute('visibility','visible');
@@ -408,8 +408,8 @@ function tick(){
   else mixLabel.setAttribute('visibility','hidden');
 
   // Readout
-  readoutEl.innerHTML='<span>ELEVON L <b style="color:#0891b2">'+(elevonL>=0?'+':'')+elevonL.toFixed(1)+'°</b></span>'
-    +'<span>ELEVON R <b style="color:#0891b2">'+(elevonR>=0?'+':'')+elevonR.toFixed(1)+'°</b></span>'
+  readoutEl.innerHTML='<span>ELEVON L <b style="color:#00ff88">'+(elevonL>=0?'+':'')+elevonL.toFixed(1)+'°</b></span>'
+    +'<span>ELEVON R <b style="color:#00ff88">'+(elevonR>=0?'+':'')+elevonR.toFixed(1)+'°</b></span>'
     +'<span>RUDDERS <b style="color:#7c3aed">'+(rudder>=0?'+':'')+rudder.toFixed(1)+'°</b></span>'
     +'<span>THROTTLE <b style="color:#dc2626">'+(sm.thr*100).toFixed(0)+'%</b></span>';
 
