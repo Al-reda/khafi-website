@@ -334,10 +334,11 @@ section { position: relative; z-index: 1; }
   text-align: center;
 }
 .sim-frame {
-  width: 100%; height: 1100px;
+  width: 100%; height: 1400px;
   border: 1px solid rgba(0,255,136,0.15);
   border-radius: 4px; margin-top: 40px;
   background: var(--bg-card);
+  overflow: hidden;
 }
 
 /* === FOOTER === */
@@ -649,7 +650,7 @@ footer {
       Try our UAV flight control simulator — adjust throttle, pitch, and roll to experience KHAFI's flight dynamics.
     </p>
   </div>
-  <iframe src="flight-sim.html" class="sim-frame reveal" style="transition-delay:0.2s;" title="UAV Flight Simulator"></iframe>
+  <iframe src="flight-sim.html" class="sim-frame reveal" style="transition-delay:0.2s;" title="UAV Flight Simulator" scrolling="no"></iframe>
 </section>
 
 <!-- FOOTER -->
