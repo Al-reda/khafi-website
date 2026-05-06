@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>UAV Flight Control Simulator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace;background:linear-gradient(170deg,#f8fafc,#f1f5f9 40%,#e8ecf1);color:#1e293b;min-height:100vh;user-select:none;-webkit-user-select:none;overflow-x:hidden}
+.grid-bg{position:fixed;inset:0;opacity:.05;pointer-events:none;background-image:linear-gradient(#94a3b8 1px,transparent 1px),linear-gradient(90deg,#94a3b8 1px,transparent 1px);background-size:40px 40px}
+.wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:20px 16px}
+.card{border:1px solid #cbd5e1;border-radius:12px;background:rgba(255,255,255,.75);padding:16px;margin-bottom:14px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.card2{border:1px solid #cbd5e1;border-radius:10px;background:rgba(255,255,255,.8);padding:10px 10px 8px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.hdr{text-align:center;margin-bottom:14px}
+.hdr h1{font-size:20px;font-weight:700;letter-spacing:5px;color:#0f172a;margin:0 0 4px}
+.hdr p{font-size:10px;color:#94a3b8;letter-spacing:3px;margin:0}
+.readout{display:flex;justify-content:center;gap:24px;font-size:10px;color:#94a3b8;letter-spacing:1px;margin-bottom:8px;flex-wrap:wrap}
+.readout b{font-weight:700}
+.gauges{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.gauge-label{font-size:9px;color:#94a3b8;letter-spacing:2px;margin-bottom:2px}
+.gauge-val{font-size:24px;font-weight:700;line-height:1.2}
+.gauge-note{font-size:8px;color:#94a3b8;margin-top:2px}
+.gauge-bar{margin-top:5px;height:5px;border-radius:3px;background:#e2e8f0;overflow:hidden;position:relative}
+.gauge-fill{position:absolute;top:0;bottom:0;border-radius:3px}
+.elevon-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.elevon-card{border:1px solid #b3e0ee;border-radius:10px;background:rgba(8,145,178,.04);padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.elevon-label{font-size:10px;color:#0891b2;font-weight:700}
+.elevon-sub{font-size:8px;color:#94a3b8}
+.elevon-val{font-size:22px;font-weight:700;color:#0891b2}
+.tx-card{border:1px solid #cbd5e1;border-radius:12px;background:rgba(255,255,255,.85);padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.tx-title{font-size:10px;color:#94a3b8;letter-spacing:3px;margin-bottom:14px;text-align:center;font-weight:600}
+.tx-row{display:flex;justify-content:center;align-items:center;gap:28px}
+.stick-col{text-align:center}
+.stick-label{font-size:9px;color:#64748b;margin-bottom:6px;letter-spacing:1px;font-weight:600}
+.ctrl-body{width:140px;padding:14px 10px;border-radius:16px;background:linear-gradient(180deg,#e2e8f0,#d1d5db);border:1px solid #94a3b8;text-align:center}
+.ctrl-screen{width:100%;height:36px;border-radius:5px;background:#f1f5f9;border:1px solid #94a3b8;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.ctrl-screen span{font-size:8px;color:#64748b;letter-spacing:1px;font-weight:700}
+.sw-row{display:flex;justify-content:center;gap:6px;margin-bottom:6px}
+.map-card{border:1px solid #cbd5e1;border-radius:12px;background:rgba(255,255,255,.8);padding:14px 18px;margin-top:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.map-title{font-size:10px;color:#94a3b8;letter-spacing:3px;margin-bottom:8px;font-weight:600}
+.map-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px 20px;font-size:10px}
+.map-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;background:rgba(241,245,249,.6)}
+.map-info{margin-top:10px;padding:8px 10px;background:rgba(8,145,178,.05);border-radius:8px;font-size:10px;color:#475569;line-height:1.7}
+.footer{text-align:center;margin-top:12px;font-size:9px;color:#94a3b8;letter-spacing:2px}
+svg text{font-family:'JetBrains Mono','Fira Code','SF Mono',monospace}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="wrap">
+  <div class="hdr">
+    <h1>UAV FLIGHT CONTROL SIMULATOR</h1>
+    <p>BLENDED WING BODY • ELEVON MIXING • WING-MOUNTED RUDDERS ±45°</p>
+  </div>
+
+  <div class="card" style="perspective:800px;overflow:hidden">
+    <div class="readout" id="readout"></div>
+    <div style="display:flex;justify-content:center;align-items:center;height:360px">
+      <svg id="aircraft" viewBox="-360 -210 720 440" style="width:100%;max-width:720px;height:100%">
+        <defs>
+          <marker id="ac" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#0891b2"/></marker>
+          <marker id="ar" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#7c3aed"/></marker>
+          <marker id="ag" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><path d="M0,0 L7,2.5 L0,5" fill="#94a3b8"/></marker>
+        </defs>
+        <ellipse id="shadow" cx="0" cy="200" rx="260" ry="28" fill="rgba(0,0,0,0.05)"/>
+
+        <!-- Main body (wing stops at hinge line) -->
+        <path d="M 0 -155 L -10 -135 L -20 -105 C -40 -65,-70 -35,-275 15 L -290 23 L -275 28 L -125 22 L -75 60 L -45 72 L -20 82 L -12 112 L -6 132 L 0 142 L 6 132 L 12 112 L 20 82 L 45 72 L 75 60 L 125 22 L 275 28 L 290 23 L 275 15 C 70 -35,40 -65,20 -105 L 10 -135 L 0 -155 Z" fill="rgba(241,245,249,0.95)" stroke="#475569" stroke-width="1.5"/>
+        <!-- Center body hump -->
+        <path d="M -15 -115 C -20 -15,-30 50,-40 70 L -20 85 L 0 90 L 20 85 L 40 70 C 30 50,20 -15,15 -115 Z" fill="rgba(226,232,240,0.4)" stroke="#94a3b8" stroke-width="0.8" stroke-dasharray="3 3"/>
+        <!-- Sensor -->
+        <ellipse cx="0" cy="-95" rx="10" ry="15" fill="rgba(8,145,178,0.08)" stroke="#0891b2" stroke-width="1"/>
+        <!-- Winglets -->
+        <path d="M -292 18 L -305 10 L -300 26 L -287 28 Z" fill="rgba(203,213,225,0.6)" stroke="#64748b" stroke-width="1"/>
+        <path d="M 292 18 L 305 10 L 300 26 L 287 28 Z" fill="rgba(203,213,225,0.6)" stroke="#64748b" stroke-width="1"/>
+
+        <!-- Hinge lines for elevons -->
+        <line x1="-270" y1="28" x2="-130" y2="22" stroke="#94a3b8" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.5"/>
+        <line x1="270" y1="28" x2="130" y2="22" stroke="#94a3b8" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.5"/>
+
+        <!-- ELEVON LEFT FLAP -->
+        <g id="elevonLG">
+          <path id="elevonLP" d="M -270 28 L -275 33 L -235 38 L -200 34 L -185 41 L -155 36 L -125 38 L -130 22 L -270 28 Z" fill="rgba(8,145,178,0.08)" stroke="#0891b2" stroke-width="2.5"/>
+          <text id="elevonLT" x="-200" y="35" fill="#0891b2" font-size="11" text-anchor="middle" font-weight="700">0°</text>
+        </g>
+        <!-- Big UP/DOWN arrow for left elevon -->
+        <g id="elevonLArrow" visibility="hidden">
+          <polygon id="elevonLAUp" points="-200,8 -210,22 -204,22 -204,38 -196,38 -196,22 -190,22" fill="#dc4040" stroke="#dc4040" stroke-width="1" opacity="0.8"/>
+          <polygon id="elevonLADown" points="-200,48 -210,34 -204,34 -204,18 -196,18 -196,34 -190,34" fill="#0891b2" stroke="#0891b2" stroke-width="1" opacity="0.8"/>
+        </g>
+        <line id="elevonLA" x1="-200" y1="25" x2="-200" y2="25" stroke="#0891b2" stroke-width="2" marker-end="url(#ac)" visibility="hidden"/>
+
+        <!-- ELEVON RIGHT FLAP -->
+        <g id="elevonRG">
+          <path id="elevonRP" d="M 270 28 L 275 33 L 235 38 L 200 34 L 185 41 L 155 36 L 125 38 L 130 22 L 270 28 Z" fill="rgba(8,145,178,0.08)" stroke="#0891b2" stroke-width="2.5"/>
+          <text id="elevonRT" x="200" y="35" fill="#0891b2" font-size="11" text-anchor="middle" font-weight="700">0°</text>
+        </g>
+        <!-- Big UP/DOWN arrow for right elevon -->
+        <g id="elevonRArrow" visibility="hidden">
+          <polygon id="elevonRAUp" points="200,8 190,22 196,22 196,38 204,38 204,22 210,22" fill="#dc4040" stroke="#dc4040" stroke-width="1" opacity="0.8"/>
+          <polygon id="elevonRADown" points="200,48 190,34 196,34 196,18 204,18 204,34 210,34" fill="#0891b2" stroke="#0891b2" stroke-width="1" opacity="0.8"/>
+        </g>
+        <line id="elevonRA" x1="200" y1="25" x2="200" y2="25" stroke="#0891b2" stroke-width="2" marker-end="url(#ac)" visibility="hidden"/>
+
+
+
+        <!-- ====== WING-MOUNTED VERTICAL FINS (fixed) — on the wings at ~70% span ====== -->
+        <!-- Left fin on wing (close to center, forward) -->
+        <path d="M -68 -8 L -75 -18 L -79 -28 L -75 -22 L -71 -14 L -66 -6 Z" fill="rgba(226,232,240,0.75)" stroke="#64748b" stroke-width="1.2"/>
+        <!-- Right fin on wing -->
+        <path d="M 68 -8 L 75 -18 L 79 -28 L 75 -22 L 71 -14 L 66 -6 Z" fill="rgba(226,232,240,0.75)" stroke="#64748b" stroke-width="1.2"/>
+
+        <!-- ====== RUDDER LEFT (on left wing, behind left fin) ====== -->
+        <!-- Pivot at (-70, -6) — hinge at base of fin, forward -->
+        <g id="rudderLG">
+          <path id="rudderLP" d="M -66 -6 L -71 -2 L -77 12 L -71 16 L -65 12 L -63 -2 Z" fill="rgba(124,58,237,0.1)" stroke="#7c3aed" stroke-width="2"/>
+          <text id="rudderLT" x="-71" y="28" fill="#7c3aed" font-size="8" text-anchor="middle" font-weight="700">0°</text>
+        </g>
+        <line id="rudderLA" x1="-71" y1="6" x2="-71" y2="6" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#ar)" visibility="hidden"/>
+
+        <!-- ====== RUDDER RIGHT (on right wing, behind right fin) ====== -->
+        <!-- Pivot at (70, -6) -->
+        <g id="rudderRG">
+          <path id="rudderRP" d="M 66 -6 L 71 -2 L 77 12 L 71 16 L 65 12 L 63 -2 Z" fill="rgba(124,58,237,0.1)" stroke="#7c3aed" stroke-width="2"/>
+          <text id="rudderRT" x="71" y="28" fill="#7c3aed" font-size="8" text-anchor="middle" font-weight="700">0°</text>
+        </g>
+        <line id="rudderRA" x1="71" y1="6" x2="71" y2="6" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#ar)" visibility="hidden"/>
+
+        <!-- Motor -->
+        <circle id="motorC" cx="0" cy="140" r="10" fill="none" stroke="#dc2626" stroke-width="1.5" opacity="0.3"/>
+        <line id="motorH" x1="-10" y1="140" x2="10" y2="140" stroke="#dc2626" stroke-width="2" opacity="0"/>
+        <line id="motorV" x1="0" y1="128" x2="0" y2="152" stroke="#dc2626" stroke-width="2" opacity="0"/>
+
+        <!-- Gear dots -->
+        <circle cx="0" cy="-60" r="3" fill="none" stroke="#059669" stroke-width="1.5"/>
+        <circle cx="-105" cy="22" r="3" fill="none" stroke="#059669" stroke-width="1.5"/>
+        <circle cx="105" cy="22" r="3" fill="none" stroke="#059669" stroke-width="1.5"/>
+
+        <!-- Labels -->
+        <text x="-200" y="58" fill="#0891b2" font-size="9" text-anchor="middle" font-weight="700">ELEVON L</text>
+        <text x="200" y="58" fill="#0891b2" font-size="9" text-anchor="middle" font-weight="700">ELEVON R</text>
+
+        <text x="-90" y="-22" fill="#64748b" font-size="7" text-anchor="middle">FIN</text>
+        <text x="90" y="-22" fill="#64748b" font-size="7" text-anchor="middle">FIN</text>
+        <text x="-90" y="24" fill="#7c3aed" font-size="8" text-anchor="middle" font-weight="700">RUDDER L</text>
+        <text x="90" y="24" fill="#7c3aed" font-size="8" text-anchor="middle" font-weight="700">RUDDER R</text>
+        <text x="0" y="168" fill="#dc2626" font-size="9" text-anchor="middle" font-weight="700">MOTOR</text>
+        <g opacity="0.4"><line x1="-320" y1="-140" x2="-320" y2="-175" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#ag)"/><text x="-320" y="-128" fill="#94a3b8" font-size="9" text-anchor="middle" font-weight="600">FWD</text></g>
+        <text id="mixLabel" x="0" y="-185" fill="#0891b2" font-size="10" text-anchor="middle" font-weight="700" opacity="0.7" visibility="hidden"></text>
+        <!-- Color legend -->
+        <g transform="translate(240,-170)">
+          <rect x="0" y="0" width="90" height="42" rx="4" fill="rgba(255,255,255,0.7)" stroke="#cbd5e1" stroke-width="0.5"/>
+          <polygon points="12,10 8,16 10,16 10,20 14,20 14,16 16,16" fill="#dc4040"/>
+          <text x="22" y="18" fill="#dc4040" font-size="8" font-weight="700">= ELEVON UP</text>
+          <polygon points="12,30 8,24 10,24 10,20 14,20 14,24 16,24" fill="#0891b2"/>
+          <text x="22" y="32" fill="#0891b2" font-size="8" font-weight="700">= ELEVON DN</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="gauges" id="gauges"></div>
+  <div class="elevon-row" id="elevonRow"></div>
+
+  <div class="tx-card">
+    <div class="tx-title">RADIOMASTER TX12 — DRAG THE STICKS</div>
+    <div class="tx-row">
+      <div class="stick-col">
+        <div class="stick-label">LEFT STICK</div>
+        <svg id="stickL" width="80" height="80" style="cursor:grab;touch-action:none">
+          <circle cx="40" cy="40" r="38" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+          <line x1="40" y1="4" x2="40" y2="76" stroke="#e2e8f0" stroke-width="1"/>
+          <line x1="4" y1="40" x2="76" y2="40" stroke="#e2e8f0" stroke-width="1"/>
+          <circle id="knobL" cx="40" cy="40" r="14" fill="white" stroke="#94a3b8" stroke-width="2"/>
+          <circle id="knobLd" cx="40" cy="40" r="4" fill="#94a3b8"/>
+        </svg>
+        <div style="margin-top:6px;font-size:9px;color:#7c3aed;font-weight:700">← CH4 YAW →</div>
+        <div style="font-size:8px;color:#7c3aed;opacity:.7">Wing Rudders ±45°</div>
+        <div style="font-size:9px;color:#dc2626;font-weight:700;margin-top:3px">↑ CH3 THROTTLE ↓</div>
+        <div style="font-size:8px;color:#dc2626;opacity:.7">Pusher Motor</div>
+      </div>
+      <div class="ctrl-body">
+        <div class="ctrl-screen"><span>RadioMaster TX12</span></div>
+        <div class="sw-row" id="switches"></div>
+        <div style="font-size:7px;color:#059669;font-weight:700">SD = GEAR CH10</div>
+        <div style="font-size:7px;color:#059669;margin-top:1px">MAIN 5+6+7</div>
+      </div>
+      <div class="stick-col">
+        <div class="stick-label">RIGHT STICK</div>
+        <svg id="stickR" width="80" height="80" style="cursor:grab;touch-action:none">
+          <circle cx="40" cy="40" r="38" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+          <line x1="40" y1="4" x2="40" y2="76" stroke="#e2e8f0" stroke-width="1"/>
+          <line x1="4" y1="40" x2="76" y2="40" stroke="#e2e8f0" stroke-width="1"/>
+          <circle id="knobR" cx="40" cy="40" r="14" fill="white" stroke="#94a3b8" stroke-width="2"/>
+          <circle id="knobRd" cx="40" cy="40" r="4" fill="#94a3b8"/>
+        </svg>
+        <div style="margin-top:6px;font-size:9px;color:#0891b2;font-weight:700">← CH1 ROLL →</div>
+        <div style="font-size:8px;color:#0891b2;opacity:.7">Elevons differential</div>
+        <div style="font-size:9px;color:#0e7490;font-weight:700;margin-top:3px">↑ CH2 PITCH ↓</div>
+        <div style="font-size:8px;color:#0e7490;opacity:.7">Elevons same direction</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="map-card">
+    <div class="map-title">ARDUPLANE OUTPUT MAP — ELEVON + WING RUDDERS</div>
+    <div class="map-grid" id="mapGrid"></div>
+    <div class="map-info"><strong style="color:#0891b2">Elevon mixing:</strong> SERVO1_FUNCTION=77 (Left Elevon), SERVO2_FUNCTION=78 (Right Elevon). <strong style="color:#7c3aed">Wing rudders:</strong> Mounted on wing-mounted vertical fins, SERVO4_FUNCTION=21. ArduPlane handles all mixing. No mixing on TX12.</div>
+  </div>
+  <div class="footer">STICKS SPRING BACK (EXCEPT THROTTLE) • ELEVON ±45° • WING RUDDERS ±45°</div>
+</div>
+
+<script>
+const MAX_DEF=45,STICK_R=40,KNOB_R=14,MX=STICK_R-KNOB_R;
+function clamp(v,a,b){return v<a?a:v>b?b:v}
+function lerp(a,b,t){return a+(b-a)*t}
+
+let ls={x:0,y:0},rs={x:0,y:0},drag=null;
+let sm={roll:0,pitch:0,yaw:0,thr:0};
+
+const aircraft=document.getElementById('aircraft');
+const shadowEl=document.getElementById('shadow');
+const readoutEl=document.getElementById('readout');
+const mixLabel=document.getElementById('mixLabel');
+const elevonLG=document.getElementById('elevonLG'),elevonLP=document.getElementById('elevonLP');
+const elevonRG=document.getElementById('elevonRG'),elevonRP=document.getElementById('elevonRP');
+const elevonLA=document.getElementById('elevonLA'),elevonRA=document.getElementById('elevonRA');
+const elevonLT=document.getElementById('elevonLT'),elevonRT=document.getElementById('elevonRT');
+const elevonLArrow=document.getElementById('elevonLArrow');
+const elevonLAUp=document.getElementById('elevonLAUp'),elevonLADown=document.getElementById('elevonLADown');
+const elevonRArrow=document.getElementById('elevonRArrow');
+const elevonRAUp=document.getElementById('elevonRAUp'),elevonRADown=document.getElementById('elevonRADown');
+const rudderLG=document.getElementById('rudderLG'),rudderLP=document.getElementById('rudderLP');
+const rudderRG=document.getElementById('rudderRG'),rudderRP=document.getElementById('rudderRP');
+const rudderLA=document.getElementById('rudderLA'),rudderRA=document.getElementById('rudderRA');
+const rudderLT=document.getElementById('rudderLT'),rudderRT=document.getElementById('rudderRT');
+const motorC=document.getElementById('motorC'),motorH=document.getElementById('motorH'),motorV=document.getElementById('motorV');
+const knobL=document.getElementById('knobL'),knobLd=document.getElementById('knobLd');
+const knobR=document.getElementById('knobR'),knobRd=document.getElementById('knobRd');
+const stickL=document.getElementById('stickL'),stickR=document.getElementById('stickR');
+
+// Switches
+const swEl=document.getElementById('switches');
+['SA','SB','SC','SD'].forEach(s=>{
+  const d=document.createElement('div');d.style.textAlign='center';
+  const b=document.createElement('div');
+  Object.assign(b.style,{width:'10px',height:'16px',borderRadius:'3px',margin:'0 auto 2px',background:s==='SD'?'#059669':'#94a3b8',opacity:s==='SD'?'0.9':'0.25'});
+  const t=document.createElement('div');t.textContent=s;
+  Object.assign(t.style,{fontSize:'6px',color:s==='SD'?'#059669':'#94a3b8',fontWeight:'600'});
+  d.appendChild(b);d.appendChild(t);swEl.appendChild(d);
+});
+
+// Gauges
+const gaugeData=[
+  {label:'ROLL',ch:'CH1',color:'#0891b2',note:'Elevons differential',key:'roll'},
+  {label:'PITCH',ch:'CH2',color:'#0e7490',note:'Elevons same dir',key:'pitch'},
+  {label:'YAW',ch:'CH4',color:'#7c3aed',note:'Wing rudders ±45°',key:'yaw'},
+  {label:'THROTTLE',ch:'CH3',color:'#dc2626',note:'Pusher motor',key:'thr'},
+];
+const gaugeEls={};
+const gaugesDiv=document.getElementById('gauges');
+gaugeData.forEach(g=>{
+  const card=document.createElement('div');card.className='card2';
+  card.innerHTML='<div class="gauge-label">'+g.label+' ('+g.ch+')</div><div class="gauge-val" style="color:'+g.color+'" id="gv_'+g.key+'"></div><div class="gauge-note">'+g.note+'</div><div class="gauge-bar"><div class="gauge-fill" id="gf_'+g.key+'" style="background:'+g.color+'"></div></div>';
+  gaugesDiv.appendChild(card);
+  gaugeEls[g.key]={val:document.getElementById('gv_'+g.key),fill:document.getElementById('gf_'+g.key)};
+});
+
+// Elevon detail
+const elevonRowEl=document.getElementById('elevonRow');
+['LEFT (MAIN 1)','RIGHT (MAIN 2)'].forEach((n,i)=>{
+  const d=document.createElement('div');d.className='elevon-card';
+  d.innerHTML='<div><div class="elevon-label">ELEVON '+n+'</div><div class="elevon-sub">= pitch '+(i===0?'+':'−')+' roll</div></div><div class="elevon-val" id="ev'+i+'"></div>';
+  elevonRowEl.appendChild(d);
+});
+const ev0=document.getElementById('ev0'),ev1=document.getElementById('ev1');
+
+// Map
+const mapData=[
+  {o:'MAIN 1',n:'Elevon Left (wing)',ch:'CH1+CH2',ax:'Roll+Pitch',c:'#0891b2'},
+  {o:'MAIN 2',n:'Elevon Right (wing)',ch:'CH1+CH2',ax:'Roll+Pitch',c:'#0891b2'},
+  {o:'MAIN 3',n:'Motor / ESC',ch:'CH3',ax:'Throttle',c:'#dc2626'},
+  {o:'MAIN 4',n:'Rudders (on wings)',ch:'CH4',ax:'Yaw ±45°',c:'#7c3aed'},
+  {o:'MAIN 5',n:'Landing Gear Nose',ch:'CH10',ax:'SD Switch',c:'#059669'},
+  {o:'MAIN 6',n:'Landing Gear Left',ch:'CH10',ax:'SD Switch',c:'#059669'},
+  {o:'MAIN 7',n:'Landing Gear Right',ch:'CH10',ax:'SD Switch',c:'#059669'},
+];
+const mapGrid=document.getElementById('mapGrid');
+mapData.forEach(r=>{
+  const d=document.createElement('div');d.className='map-row';
+  d.innerHTML='<span style="font-weight:700;color:'+r.c+';min-width:52px">'+r.o+'</span><span style="flex:1;color:#475569">'+r.n+'</span><span style="color:#94a3b8;font-size:9px">'+r.ch+'</span><span style="color:'+r.c+';font-size:9px;font-weight:700;min-width:55px;text-align:right">'+r.ax+'</span>';
+  mapGrid.appendChild(d);
+});
+
+// Stick interaction
+function getPos(e,svg){
+  const r=svg.getBoundingClientRect();
+  const cx=r.left+r.width/2,cy=r.top+r.height/2;
+  let dx=e.clientX-cx,dy=e.clientY-cy;
+  const d=Math.sqrt(dx*dx+dy*dy);
+  if(d>MX){dx=dx/d*MX;dy=dy/d*MX}
+  return{x:clamp(dx/MX,-1,1),y:clamp(dy/MX,-1,1)};
+}
+stickL.addEventListener('pointerdown',e=>{e.preventDefault();e.target.setPointerCapture(e.pointerId);drag='left';ls=getPos(e,stickL);stickL.style.cursor='grabbing'});
+stickR.addEventListener('pointerdown',e=>{e.preventDefault();e.target.setPointerCapture(e.pointerId);drag='right';rs=getPos(e,stickR);stickR.style.cursor='grabbing'});
+document.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  if(drag==='left')ls=getPos(e,stickL);else rs=getPos(e,stickR);
+});
+document.addEventListener('pointerup',()=>{drag=null;stickL.style.cursor='grab';stickR.style.cursor='grab'});
+
+// ANIMATION LOOP
+function tick(){
+  if(!drag||drag!=='right'){
+    rs.x=Math.abs(rs.x)<0.005?0:rs.x*0.88;
+    rs.y=Math.abs(rs.y)<0.005?0:rs.y*0.88;
+  }
+  if(!drag||drag!=='left'){
+    ls.x=Math.abs(ls.x)<0.005?0:ls.x*0.88;
+  }
+  const t=0.30;
+  sm.roll=lerp(sm.roll,rs.x,t);
+  sm.pitch=lerp(sm.pitch,-rs.y,t);
+  sm.yaw=lerp(sm.yaw,ls.x,t);
+  sm.thr=lerp(sm.thr,(-ls.y+1)/2,t);
+
+  const elevonL=clamp(sm.pitch+sm.roll,-1,1)*MAX_DEF;
+  const elevonR=clamp(sm.pitch-sm.roll,-1,1)*MAX_DEF;
+  const rudder=sm.yaw*MAX_DEF;
+
+  // Knobs
+  const lkx=40+ls.x*MX,lky=40+ls.y*MX;
+  const rkx=40+rs.x*MX,rky=40+rs.y*MX;
+  knobL.setAttribute('cx',lkx);knobL.setAttribute('cy',lky);
+  knobLd.setAttribute('cx',lkx);knobLd.setAttribute('cy',lky);
+  knobR.setAttribute('cx',rkx);knobR.setAttribute('cy',rky);
+  knobRd.setAttribute('cx',rkx);knobRd.setAttribute('cy',rky);
+
+  // Aircraft 3D transform
+  aircraft.style.transform='rotateX('+sm.pitch*25+'deg) rotateZ('+sm.roll*30+'deg) rotateY('+sm.yaw*15+'deg)';
+  shadowEl.setAttribute('cx',sm.yaw*20);
+  shadowEl.setAttribute('cy',200+sm.pitch*25);
+
+  // ELEVONS — UP/DOWN with big arrows, strong colors, foreshortening
+  const aP=Math.abs(sm.pitch),aR=Math.abs(sm.roll);
+  const absL=Math.abs(elevonL),absR=Math.abs(elevonR);
+  const scL=1-absL/MAX_DEF*0.45;
+  const scR=1-absR/MAX_DEF*0.45;
+  elevonLG.setAttribute('transform','translate(0,'+(25*(1-scL))+') scale(1,'+scL+')');
+  elevonRG.setAttribute('transform','translate(0,'+(25*(1-scR))+') scale(1,'+scR+')');
+  // Strong color: UP=red, DOWN=teal
+  if(elevonL>1){elevonLP.setAttribute('fill','rgba(220,64,64,'+(0.15+absL/MAX_DEF*0.5)+')');elevonLP.setAttribute('stroke','#dc4040')}
+  else if(elevonL<-1){elevonLP.setAttribute('fill','rgba(8,145,178,'+(0.15+absL/MAX_DEF*0.5)+')');elevonLP.setAttribute('stroke','#0891b2')}
+  else{elevonLP.setAttribute('fill','rgba(8,145,178,0.06)');elevonLP.setAttribute('stroke','#0891b2')}
+  if(elevonR>1){elevonRP.setAttribute('fill','rgba(220,64,64,'+(0.15+absR/MAX_DEF*0.5)+')');elevonRP.setAttribute('stroke','#dc4040')}
+  else if(elevonR<-1){elevonRP.setAttribute('fill','rgba(8,145,178,'+(0.15+absR/MAX_DEF*0.5)+')');elevonRP.setAttribute('stroke','#0891b2')}
+  else{elevonRP.setAttribute('fill','rgba(8,145,178,0.06)');elevonRP.setAttribute('stroke','#0891b2')}
+  // Angle text with big arrow emoji
+  elevonLT.textContent=(elevonL>1?'\u2B06 +'+elevonL.toFixed(0)+'\u00b0':elevonL<-1?'\u2B07 '+elevonL.toFixed(0)+'\u00b0':'0\u00b0');
+  elevonRT.textContent=(elevonR>1?'\u2B06 +'+elevonR.toFixed(0)+'\u00b0':elevonR<-1?'\u2B07 '+elevonR.toFixed(0)+'\u00b0':'0\u00b0');
+  elevonLT.setAttribute('fill',elevonL>1?'#dc4040':elevonL<-1?'#0891b2':'#0891b2');
+  elevonRT.setAttribute('fill',elevonR>1?'#dc4040':elevonR<-1?'#0891b2':'#0891b2');
+  // Big chunky arrow shapes
+  if(absL>2){
+    elevonLArrow.setAttribute('visibility','visible');
+    elevonLAUp.setAttribute('visibility',elevonL>0?'visible':'hidden');
+    elevonLADown.setAttribute('visibility',elevonL<0?'visible':'hidden');
+    var oL=0.3+absL/MAX_DEF*0.7;
+    elevonLAUp.setAttribute('opacity',oL);elevonLADown.setAttribute('opacity',oL);
+  }else{elevonLArrow.setAttribute('visibility','hidden')}
+  if(absR>2){
+    elevonRArrow.setAttribute('visibility','visible');
+    elevonRAUp.setAttribute('visibility',elevonR>0?'visible':'hidden');
+    elevonRADown.setAttribute('visibility',elevonR<0?'visible':'hidden');
+    var oR=0.3+absR/MAX_DEF*0.7;
+    elevonRAUp.setAttribute('opacity',oR);elevonRADown.setAttribute('opacity',oR);
+  }else{elevonRArrow.setAttribute('visibility','hidden')}
+
+  // WING RUDDERS — pivots at (-218, 10) and (218, 10)
+  const yF=0.1+Math.abs(sm.yaw)*0.3;
+  rudderLG.setAttribute('transform','rotate('+rudder+' -71 -6)');
+  rudderLP.setAttribute('fill','rgba(124,58,237,'+yF+')');
+  rudderLT.textContent=(rudder>=0?'+':'')+rudder.toFixed(1)+'°';
+  rudderRG.setAttribute('transform','rotate('+rudder+' 71 -6)');
+  rudderRP.setAttribute('fill','rgba(124,58,237,'+yF+')');
+  rudderRT.textContent=(rudder>=0?'+':'')+rudder.toFixed(1)+'°';
+
+  if(Math.abs(sm.yaw)>0.03){
+    rudderLA.setAttribute('visibility','visible');
+    rudderLA.setAttribute('x1',-71+rudder*0.2);rudderLA.setAttribute('x2',-71+rudder*0.7);rudderLA.setAttribute('y1',6);rudderLA.setAttribute('y2',6);
+    rudderRA.setAttribute('visibility','visible');
+    rudderRA.setAttribute('x1',71+rudder*0.2);rudderRA.setAttribute('x2',71+rudder*0.7);rudderRA.setAttribute('y1',6);rudderRA.setAttribute('y2',6);
+  }else{rudderLA.setAttribute('visibility','hidden');rudderRA.setAttribute('visibility','hidden')}
+
+  // Motor
+  motorC.setAttribute('opacity',0.3+sm.thr*0.7);
+  if(sm.thr>0.03){
+    const mo=0.4+sm.thr*0.6;
+    motorH.setAttribute('opacity',mo);motorH.setAttribute('x1',-10-sm.thr*6);motorH.setAttribute('x2',10+sm.thr*6);
+    motorV.setAttribute('opacity',mo);motorV.setAttribute('y1',128-sm.thr*6);motorV.setAttribute('y2',152+sm.thr*6);
+  }else{motorH.setAttribute('opacity',0);motorV.setAttribute('opacity',0)}
+
+  // Mix label
+  if(aP>0.08&&aR<0.08){mixLabel.setAttribute('visibility','visible');mixLabel.textContent='PITCH → BOTH ELEVONS '+(sm.pitch>0?'UP ↑':'DOWN ↓')}
+  else if(aR>0.08&&aP<0.08){mixLabel.setAttribute('visibility','visible');mixLabel.textContent='ROLL → ELEVONS DIFFERENTIAL '+(sm.roll>0?'→':'←')}
+  else if(aR>0.08&&aP>0.08){mixLabel.setAttribute('visibility','visible');mixLabel.textContent='MIXED: PITCH + ROLL'}
+  else mixLabel.setAttribute('visibility','hidden');
+
+  // Readout
+  readoutEl.innerHTML='<span>ELEVON L <b style="color:#0891b2">'+(elevonL>=0?'+':'')+elevonL.toFixed(1)+'°</b></span>'
+    +'<span>ELEVON R <b style="color:#0891b2">'+(elevonR>=0?'+':'')+elevonR.toFixed(1)+'°</b></span>'
+    +'<span>RUDDERS <b style="color:#7c3aed">'+(rudder>=0?'+':'')+rudder.toFixed(1)+'°</b></span>'
+    +'<span>THROTTLE <b style="color:#dc2626">'+(sm.thr*100).toFixed(0)+'%</b></span>';
+
+  // Gauges
+  const gvals={roll:sm.roll*MAX_DEF,pitch:sm.pitch*MAX_DEF,yaw:sm.yaw*MAX_DEF,thr:sm.thr*100};
+  for(const k in gvals){
+    const v=gvals[k],el=gaugeEls[k];
+    if(k==='thr'){
+      el.val.textContent=v.toFixed(1)+'%';
+      el.fill.style.left='0';el.fill.style.right='auto';el.fill.style.width=v+'%';
+    }else{
+      el.val.textContent=(v>=0?'+':'')+v.toFixed(1)+'°';
+      if(v>=0){el.fill.style.left='50%';el.fill.style.right='auto';el.fill.style.width=Math.abs(v/MAX_DEF)*50+'%'}
+      else{el.fill.style.right='50%';el.fill.style.left='auto';el.fill.style.width=Math.abs(v/MAX_DEF)*50+'%'}
+    }
+  }
+  ev0.textContent=(elevonL>=0?'+':'')+elevonL.toFixed(1)+'°';
+  ev1.textContent=(elevonR>=0?'+':'')+elevonR.toFixed(1)+'°';
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

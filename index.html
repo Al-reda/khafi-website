@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KHAFI — Stealth Loyal Wingman UCAV</title>
+<meta name="description" content="KFUPM Team M009 — Stealth Loyal Wingman UCAV Prototype with Autonomous Takeoff & Landing"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #111111;
+  --bg-card: #161616;
+  --accent-green: #00ff88;
+  --accent-amber: #ffa500;
+  --accent-red: #ff3333;
+  --accent-cyan: #00e5ff;
+  --text-primary: #e8e8e8;
+  --text-secondary: #888888;
+  --text-dim: #555555;
+  --olive: #556b2f;
+  --grid-color: rgba(0,255,136,0.04);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Barlow', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  cursor: crosshair;
+}
+
+/* === GRID OVERLAY === */
+.grid-overlay {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(var(--grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* === SCANLINE === */
+.scanline {
+  position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 9999;
+  background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+  animation: scanDown 4s linear infinite;
+  opacity: 0.15;
+  pointer-events: none;
+}
+@keyframes scanDown {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(100vh); }
+}
+
+/* === NAV === */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 18px 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0,255,136,0.08);
+  transition: all 0.3s;
+}
+nav.scrolled { background: rgba(10,10,10,0.95); }
+.nav-logo {
+  font-family: 'Orbitron', monospace;
+  font-weight: 800; font-size: 22px;
+  color: var(--accent-green);
+  letter-spacing: 6px;
+  text-decoration: none;
+}
+.nav-logo span { color: var(--text-dim); font-size: 11px; letter-spacing: 2px; display: block; }
+.nav-links { display: flex; gap: 30px; }
+.nav-links a {
+  color: var(--text-secondary); text-decoration: none;
+  font-family: 'Share Tech Mono', monospace; font-size: 12px;
+  letter-spacing: 3px; text-transform: uppercase;
+  transition: color 0.3s; position: relative;
+}
+.nav-links a:hover { color: var(--accent-green); }
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px;
+  background: var(--accent-green); transition: width 0.3s;
+}
+.nav-links a:hover::after { width: 100%; }
+
+/* === HERO === */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  position: relative; overflow: hidden;
+  padding: 120px 40px 80px;
+}
+.hero-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background: radial-gradient(ellipse at 50% 30%, rgba(0,255,136,0.04) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 80%, rgba(255,165,0,0.03) 0%, transparent 40%);
+}
+.hero-classified {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 8px; color: var(--accent-red);
+  border: 1px solid var(--accent-red);
+  padding: 6px 20px; margin-bottom: 40px;
+  animation: blink 2s infinite;
+  position: relative; z-index: 1;
+}
+@keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+
+.hero-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(60px, 10vw, 140px);
+  font-weight: 900; letter-spacing: 12px;
+  color: var(--text-primary);
+  text-align: center; line-height: 1;
+  position: relative; z-index: 1;
+  text-shadow: 0 0 80px rgba(0,255,136,0.15);
+}
+.hero-subtitle {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px; letter-spacing: 6px; color: var(--text-secondary);
+  margin-top: 20px; text-align: center;
+  position: relative; z-index: 1;
+}
+.hero-line {
+  width: 120px; height: 1px; background: var(--accent-green);
+  margin: 30px auto; opacity: 0.5;
+  position: relative; z-index: 1;
+}
+.hero-tagline {
+  font-size: 18px; color: var(--text-secondary); text-align: center;
+  max-width: 600px; line-height: 1.6; font-weight: 300;
+  position: relative; z-index: 1;
+}
+.hero-stats {
+  display: flex; gap: 60px; margin-top: 50px;
+  position: relative; z-index: 1;
+}
+.hero-stat { text-align: center; }
+.hero-stat-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 32px; font-weight: 700; color: var(--accent-green);
+}
+.hero-stat-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 3px; color: var(--text-dim);
+  margin-top: 6px;
+}
+.scroll-indicator {
+  position: absolute; bottom: 40px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 4px; color: var(--text-dim);
+  animation: bob 2s ease-in-out infinite;
+}
+@keyframes bob { 0%,100% { transform:translateY(0); } 50% { transform:translateY(8px); } }
+
+/* === SECTIONS === */
+section { position: relative; z-index: 1; }
+.section-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 6px; color: var(--accent-green);
+  margin-bottom: 12px; opacity: 0.7;
+}
+.section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 700; letter-spacing: 4px;
+  margin-bottom: 20px;
+}
+.section-desc {
+  font-size: 16px; color: var(--text-secondary);
+  max-width: 700px; line-height: 1.8; font-weight: 300;
+}
+
+/* === MISSION SECTION === */
+.mission {
+  padding: 120px 40px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+  max-width: 1200px; margin: 0 auto;
+  align-items: center;
+}
+.mission-img {
+  width: 100%; border-radius: 4px;
+  border: 1px solid rgba(0,255,136,0.1);
+  filter: grayscale(0.2);
+  transition: filter 0.5s;
+}
+.mission-img:hover { filter: grayscale(0); }
+
+/* === AIRCRAFT === */
+.aircraft {
+  padding: 120px 40px;
+  max-width: 1400px; margin: 0 auto;
+  text-align: center;
+}
+.aircraft-hero-img {
+  width: 100%; max-width: 900px; margin: 40px auto; display: block;
+  border: 1px solid rgba(0,255,136,0.08);
+  border-radius: 4px;
+}
+.aircraft-views {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  margin-top: 40px;
+}
+.aircraft-view {
+  background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 4px; overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.aircraft-view:hover {
+  border-color: rgba(0,255,136,0.2);
+  transform: translateY(-4px);
+}
+.aircraft-view img { width: 100%; display: block; }
+.aircraft-view-label {
+  padding: 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 3px; color: var(--text-dim);
+}
+
+/* === SPECS === */
+.specs {
+  padding: 120px 40px;
+  max-width: 1200px; margin: 0 auto;
+}
+.specs-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px; margin-top: 50px;
+}
+.spec-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-left: 3px solid var(--accent-green);
+  padding: 24px; border-radius: 0 4px 4px 0;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.spec-card:hover {
+  border-left-color: var(--accent-amber);
+  transform: translateX(4px);
+}
+.spec-id {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; color: var(--accent-green); letter-spacing: 3px;
+}
+.spec-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px; font-weight: 600; margin: 8px 0 4px;
+  letter-spacing: 1px;
+}
+.spec-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 28px; font-weight: 800; color: var(--accent-amber);
+  margin: 10px 0;
+}
+.spec-detail { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+.spec-status {
+  display: inline-block; margin-top: 10px; padding: 3px 10px;
+  border-radius: 2px; font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 2px;
+  background: rgba(0,255,136,0.1); color: var(--accent-green);
+  border: 1px solid rgba(0,255,136,0.2);
+}
+
+/* === GALLERY === */
+.gallery {
+  padding: 120px 40px;
+  max-width: 1400px; margin: 0 auto;
+}
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 300px;
+  gap: 12px; margin-top: 50px;
+}
+.gallery-item {
+  overflow: hidden; border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.05);
+  position: relative; cursor: pointer;
+}
+.gallery-item.tall { grid-row: span 2; }
+.gallery-item img {
+  width: 100%; height: 100%; object-fit: cover;
+  filter: grayscale(0.3); transition: all 0.6s;
+}
+.gallery-item:hover img { filter: grayscale(0); transform: scale(1.05); }
+.gallery-item::after {
+  content: attr(data-label); position: absolute; bottom: 12px; left: 12px;
+  font-family: 'Share Tech Mono', monospace; font-size: 10px;
+  letter-spacing: 3px; color: var(--accent-green);
+  background: rgba(0,0,0,0.7); padding: 4px 10px;
+  border-radius: 2px;
+}
+
+/* === TEAM === */
+.team {
+  padding: 120px 40px;
+  max-width: 1200px; margin: 0 auto;
+}
+.team-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px; margin-top: 50px;
+}
+.team-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 30px 20px; text-align: center;
+  border-radius: 4px;
+  transition: border-color 0.3s, transform 0.3s;
+  position: relative; overflow: hidden;
+}
+.team-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--accent-green); transform: scaleX(0);
+  transition: transform 0.3s;
+}
+.team-card:hover::before { transform: scaleX(1); }
+.team-card:hover { border-color: rgba(0,255,136,0.15); transform: translateY(-4px); }
+.team-dept {
+  font-family: 'Orbitron', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 4px; color: var(--accent-amber);
+  margin-bottom: 12px;
+}
+.team-name { font-size: 16px; font-weight: 600; letter-spacing: 1px; }
+.team-role { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+
+/* === SIMULATOR === */
+.simulator {
+  padding: 120px 40px;
+  max-width: 1200px; margin: 0 auto;
+  text-align: center;
+}
+.sim-frame {
+  width: 100%; height: 700px;
+  border: 1px solid rgba(0,255,136,0.15);
+  border-radius: 4px; margin-top: 40px;
+  background: var(--bg-card);
+}
+
+/* === FOOTER === */
+footer {
+  padding: 60px 40px 40px;
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  margin-top: 80px;
+}
+.footer-logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 28px; font-weight: 800;
+  color: var(--accent-green); letter-spacing: 8px;
+}
+.footer-info {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; color: var(--text-dim);
+  letter-spacing: 3px; margin-top: 12px; line-height: 2;
+}
+
+/* === REVEAL ANIMATION === */
+.reveal {
+  opacity: 0; transform: translateY(40px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* === RADAR ANIMATION === */
+.radar {
+  position: absolute; top: 50%; right: 5%; width: 300px; height: 300px;
+  transform: translateY(-50%); opacity: 0.06;
+}
+.radar-circle {
+  position: absolute; border-radius: 50%;
+  border: 1px solid var(--accent-green);
+}
+.radar-sweep {
+  position: absolute; top: 50%; left: 50%;
+  width: 50%; height: 2px;
+  background: linear-gradient(90deg, var(--accent-green), transparent);
+  transform-origin: left center;
+  animation: sweep 3s linear infinite;
+}
+@keyframes sweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+  .mission { grid-template-columns: 1fr; gap: 40px; }
+  .gallery-grid { grid-template-columns: 1fr 1fr; }
+  .hero-stats { gap: 30px; flex-wrap: wrap; justify-content: center; }
+  nav { padding: 14px 20px; }
+  .nav-links { display: none; }
+  .aircraft-views { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .gallery-grid { grid-template-columns: 1fr; }
+  .hero-title { letter-spacing: 4px; }
+  section, .hero { padding-left: 20px; padding-right: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="grid-overlay"></div>
+<div class="scanline"></div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo">KHAFI <span>TEAM M009</span></a>
+  <div class="nav-links">
+    <a href="#mission">MISSION</a>
+    <a href="#aircraft">AIRCRAFT</a>
+    <a href="#specs">SPECS</a>
+    <a href="#gallery">GALLERY</a>
+    <a href="#team">TEAM</a>
+    <a href="#simulator">SIMULATOR</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="radar">
+    <div class="radar-circle" style="inset:0;"></div>
+    <div class="radar-circle" style="inset:25%;"></div>
+    <div class="radar-circle" style="inset:45%;"></div>
+    <div class="radar-sweep"></div>
+  </div>
+  <div class="hero-classified">▲ CLASSIFIED — SENIOR DESIGN PROJECT</div>
+  <h1 class="hero-title">KHAFI</h1>
+  <p class="hero-subtitle">خفي &mdash; STEALTH LOYAL WINGMAN UCAV</p>
+  <div class="hero-line"></div>
+  <p class="hero-tagline">
+    A stealth, non-weaponized loyal wingman UCAV prototype with autonomous takeoff &amp; landing — built for manned–unmanned teaming in Saudi Arabia.
+  </p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-val">20%</div>
+      <div class="hero-stat-label">RCS REDUCTION</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">6/6</div>
+      <div class="hero-stat-label">SCENARIOS PASSED</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">2.35m</div>
+      <div class="hero-stat-label">LANDING CEP</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val">71.4%</div>
+      <div class="hero-stat-label">MISSION SUCCESS</div>
+    </div>
+  </div>
+  <div class="scroll-indicator">▼ SCROLL TO DECLASSIFY ▼</div>
+</section>
+
+<!-- MISSION -->
+<section class="mission" id="mission">
+  <div class="reveal">
+    <div class="section-tag">// 001 — MISSION BRIEF</div>
+    <h2 class="section-title">THE PROBLEM</h2>
+    <p class="section-desc">
+      Jet fighters are costly and high-risk to operate. Saudi Arabia lacks a fixed-wing loyal wingman platform. An unmanned test aircraft is needed to reduce pilot risk and enable manned–unmanned teaming in combat and surveillance missions.
+    </p>
+    <div style="margin-top:30px;">
+      <p class="section-desc">
+        <strong style="color:var(--accent-green);">Our solution:</strong> KHAFI — a stealth-inspired UCAV prototype that flies ahead of the manned fighter, extending radar coverage and protecting the pilot. The F-15 pilot commands the wingman to take off, scan, detect, and return — all autonomously.
+      </p>
+    </div>
+  </div>
+  <div class="reveal" style="transition-delay:0.2s;">
+    <img src="images/expo-booth.jpg" alt="KHAFI at CIE EXPO 2026" class="mission-img"/>
+  </div>
+</section>
+
+<!-- AIRCRAFT -->
+<section class="aircraft" id="aircraft">
+  <div class="reveal">
+    <div class="section-tag">// 002 — THE AIRCRAFT</div>
+    <h2 class="section-title">KHAFI PROTOTYPE</h2>
+    <p class="section-desc" style="margin:0 auto;">
+      Blended wing body (BWB) with 1.80m wingspan and 35° sweep angle. CNC-cut EPS20 foam core wrapped in carbon fiber with epoxy — lightweight, structurally robust, and stealth-optimized.
+    </p>
+  </div>
+  <div class="reveal" style="transition-delay:0.15s;">
+    <img src="images/khafi-renders.png" alt="KHAFI multi-view render" class="aircraft-hero-img"/>
+  </div>
+  <div class="aircraft-views reveal" style="transition-delay:0.3s;">
+    <div class="aircraft-view">
+      <img src="images/expo-front.jpg" alt="Front view at expo"/>
+      <div class="aircraft-view-label">EXPO — FRONT VIEW</div>
+    </div>
+    <div class="aircraft-view">
+      <img src="images/expo-detection.jpg" alt="Live detection demo"/>
+      <div class="aircraft-view-label">LIVE DETECTION FEED</div>
+    </div>
+    <div class="aircraft-view">
+      <img src="images/expo-angle.jpg" alt="Angle view"/>
+      <div class="aircraft-view-label">EXPO — SIDE ANGLE</div>
+    </div>
+  </div>
+</section>
+
+<!-- SPECS -->
+<section class="specs" id="specs">
+  <div class="reveal">
+    <div class="section-tag">// 003 — SPECIFICATIONS</div>
+    <h2 class="section-title">TECHNICAL SPECS</h2>
+  </div>
+  <div class="specs-grid">
+    <div class="spec-card reveal">
+      <div class="spec-id">INT-SPEC-1</div>
+      <div class="spec-name">Mission Success Rate</div>
+      <div class="spec-val">71.4%</div>
+      <div class="spec-detail">Task-based: 15/21 tasks completed across 3 cycles. Required ≥ 66.7%</div>
+      <div class="spec-status">✓ VALIDATED</div>
+    </div>
+    <div class="spec-card reveal" style="transition-delay:0.1s;">
+      <div class="spec-id">INT-SPEC-2</div>
+      <div class="spec-name">Stealth Detection Reduction</div>
+      <div class="spec-val">20%</div>
+      <div class="spec-detail">RCS reduced from 0.5 m² to 0.2 m². Detection range 500m → 400m.</div>
+      <div class="spec-status">✓ VALIDATED</div>
+    </div>
+    <div class="spec-card reveal" style="transition-delay:0.2s;">
+      <div class="spec-id">INT-SPEC-3</div>
+      <div class="spec-name">Landing Accuracy (CEP)</div>
+      <div class="spec-val">2.35m</div>
+      <div class="spec-detail">σx = 1.9m, σy = 2.1m. Required ≤ 50m CEP.</div>
+      <div class="spec-status">✓ VALIDATED</div>
+    </div>
+    <div class="spec-card reveal" style="transition-delay:0.05s;">
+      <div class="spec-id">SPEC-3</div>
+      <div class="spec-name">Lost-Link Failsafe</div>
+      <div class="spec-val">4.0s</div>
+      <div class="spec-detail">Auto RTL triggered within 4.5s avg. Required ≤ 5s detection.</div>
+      <div class="spec-status">✓ VALIDATED</div>
+    </div>
+    <div class="spec-card reveal" style="transition-delay:0.15s;">
+      <div class="spec-id">SPEC-4</div>
+      <div class="spec-name">Telemetry Logging</div>
+      <div class="spec-val">1.003s</div>
+      <div class="spec-detail">Continuous 1 Hz logging achieved. Avg interval 1.003s.</div>
+      <div class="spec-status">✓ VALIDATED</div>
+    </div>
+    <div class="spec-card reveal" style="transition-delay:0.25s;">
+      <div class="spec-id">CONST-4</div>
+      <div class="spec-name">Simulation Scenarios</div>
+      <div class="spec-val">6/6</div>
+      <div class="spec-detail">Normal, Lost-Link, Wind, Low Battery, GPS Loss, Engine Failure — all passed.</div>
+      <div class="spec-status">✓ VALIDATED</div>
+    </div>
+    <div class="spec-card reveal" style="transition-delay:0.1s;">
+      <div class="spec-id">PLATFORM</div>
+      <div class="spec-name">Flight Performance</div>
+      <div class="spec-val">≥15 m/s</div>
+      <div class="spec-detail">Airspeed in level flight. Range ≥ 3km. Control ≤ 50m LOS.</div>
+      <div class="spec-status">✓ SPEC MET</div>
+    </div>
+    <div class="spec-card reveal" style="transition-delay:0.2s;">
+      <div class="spec-id">AIRFRAME</div>
+      <div class="spec-name">Wingspan</div>
+      <div class="spec-val">1.80m</div>
+      <div class="spec-detail">BWB config. 35° sweep. 0.5kg modular payload bay. Carbon fiber shell.</div>
+      <div class="spec-status">✓ BUILT</div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery" id="gallery">
+  <div class="reveal">
+    <div class="section-tag">// 004 — GALLERY</div>
+    <h2 class="section-title">BUILD & EXPO</h2>
+  </div>
+  <div class="gallery-grid">
+    <div class="gallery-item tall reveal" data-label="LAB BUILD">
+      <img src="images/lab-build.jpg" alt="Building KHAFI in the lab"/>
+    </div>
+    <div class="gallery-item reveal" data-label="CIE EXPO 2026" style="transition-delay:0.1s;">
+      <img src="images/expo-booth.jpg" alt="KHAFI at CIE EXPO booth"/>
+    </div>
+    <div class="gallery-item reveal" data-label="DETECTION DEMO" style="transition-delay:0.2s;">
+      <img src="images/expo-detection.jpg" alt="Live object detection demo"/>
+    </div>
+    <div class="gallery-item reveal" data-label="SIDE PROFILE" style="transition-delay:0.1s;">
+      <img src="images/expo-angle.jpg" alt="Side angle of KHAFI"/>
+    </div>
+    <div class="gallery-item reveal" data-label="PROJECT POSTER" style="transition-delay:0.2s;">
+      <img src="images/poster.png" alt="Project poster"/>
+    </div>
+    <div class="gallery-item reveal" data-label="BRANDING" style="transition-delay:0.3s;">
+      <img src="images/khafi-stickers.png" alt="KHAFI sticker designs"/>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team" id="team">
+  <div class="reveal">
+    <div class="section-tag">// 005 — PERSONNEL</div>
+    <h2 class="section-title">TEAM M009</h2>
+    <p class="section-desc">KFUPM Senior Design Project — 4 Disciplines United</p>
+  </div>
+  <div class="team-grid">
+    <div class="team-card reveal">
+      <div class="team-dept">AE</div>
+      <div class="team-name">Khalil Binsabaan</div>
+      <div class="team-role">Aerospace Engineering</div>
+    </div>
+    <div class="team-card reveal" style="transition-delay:0.05s;">
+      <div class="team-dept">CS</div>
+      <div class="team-name">Abdulaziz Alsadrani</div>
+      <div class="team-role">Computer Science</div>
+    </div>
+    <div class="team-card reveal" style="transition-delay:0.1s;">
+      <div class="team-dept">CS</div>
+      <div class="team-name">Alridha Almajed</div>
+      <div class="team-role">Computer Science</div>
+    </div>
+    <div class="team-card reveal" style="transition-delay:0.15s;">
+      <div class="team-dept">EE</div>
+      <div class="team-name">Muath Alodhaibi</div>
+      <div class="team-role">Electrical Engineering</div>
+    </div>
+    <div class="team-card reveal" style="transition-delay:0.2s;">
+      <div class="team-dept">ME</div>
+      <div class="team-name">Salman Alshaikh</div>
+      <div class="team-role">Mechanical Engineering</div>
+    </div>
+    <div class="team-card reveal" style="transition-delay:0.25s;">
+      <div class="team-dept">AE</div>
+      <div class="team-name">Ahmed Aloufi</div>
+      <div class="team-role">Aerospace Engineering</div>
+    </div>
+  </div>
+  <div class="reveal" style="margin-top:40px; text-align:center;">
+    <div class="section-tag">COACH</div>
+    <p style="font-size:18px; font-weight:600; margin-top:8px;">Dr. Md Abdullah Al Bari</p>
+  </div>
+</section>
+
+<!-- SIMULATOR -->
+<section class="simulator" id="simulator">
+  <div class="reveal">
+    <div class="section-tag">// 006 — INTERACTIVE</div>
+    <h2 class="section-title">FLIGHT SIMULATOR</h2>
+    <p class="section-desc" style="margin:0 auto;">
+      Try our UAV flight control simulator — adjust throttle, pitch, and roll to experience KHAFI's flight dynamics.
+    </p>
+  </div>
+  <iframe src="flight-sim.html" class="sim-frame reveal" style="transition-delay:0.2s;" title="UAV Flight Simulator"></iframe>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">KHAFI</div>
+  <div class="footer-info">
+    KFUPM — TEAM M009 — CIE EXPO 2026<br/>
+    STEALTH LOYAL WINGMAN UCAV — AUTONOMOUS TAKEOFF &amp; LANDING PROTOTYPE<br/><br/>
+    KING FAHD UNIVERSITY OF PETROLEUM &amp; MINERALS<br/>
+    DHAHRAN, SAUDI ARABIA
+  </div>
+  <p style="margin-top:30px; font-size:11px; color:var(--text-dim);">
+    نحلم ونحقق — We dream and we achieve
+  </p>
+</footer>
+
+<script>
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+reveals.forEach(el => observer.observe(el));
+
+// Nav scroll effect
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// Smooth nav clicks
+document.querySelectorAll('.nav-links a').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+  });
+});
+</script>
+</body>
+</html>
